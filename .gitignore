@@ -1,0 +1,5 @@
+logs
+*.log
+.grunt
+node-modules
+*~
