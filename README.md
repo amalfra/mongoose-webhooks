@@ -3,6 +3,68 @@ Mongoose Webhooks
 
 Sends webhook on mongoose model events.
 
+## Installation
+In your project root, run the following:
+
+```sh
+npm install mongoose-webhooks
+```
+
+## Usage
+To use `mongoose-webhooks` plugin in your model you will have to first require the plugin as
+
+```javascript
+var mongooseWebhooks = require('mongoose-webhooks');
+```
+
+The following schema definition defines a "User" schema, and uses mongoose-webhooks plugin
+
+```javascript
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
+// Require the plugin
+var mongooseWebhooks = require('mongoose-webhooks');
+
+var User = new Schema({
+  username : { type : String, required : true},
+  password : { type : String, required : true },
+  email : { type : String, required : true},
+  lastModified : Date,
+  created : Date
+});
+
+// Apply the plugin to schema. Note that the url option is required.
+User.plugin(mongooseWebhooks, {'url': 'http://site.com/mongoose-webhook'});
+```
+
+Now you will be getting a webhook POST request to configured url. The webhook payload will be
+
+```javascript
+{
+  "event": "save",
+  "data": {
+    "__v": 0,
+    "username": "test",
+    "password": "test",
+    "email": "test@test.com"
+    "_id": "576cf0eacdefabd20a52ac89"
+  }
+}
+```
+
+The event key can have following values
+  * **save** : When the mongoose document is inserted
+  * **update** : When the mongoose document is updated
+  * **remove** : When the mongoose document is removed
+
+The data key will have the JSON seralized document from mongoose.
+
+## Options
+
+The two options supported by plugin are
+  * **url** : You can specify the URL to send webhook with this option. *This is a required option*
+  * **useragent** : Lets you specify the `User-Agent` header for the webhook request. This is optional.
+
 ## Development
 
 Questions, problems or suggestions? Please post them on the [issue tracker](https://github.com/amalfra/mongoose-webhooks/issues).
