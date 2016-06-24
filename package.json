@@ -1,0 +1,26 @@
+{
+  "name": "mongoose-webhooks",
+  "version": "0.0.1",
+  "description": "Mongoose plugin to send webhook on mongoose model events.",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:amalfra/mongoose-webhooks.git"
+  },
+  "author": "Amal Francis",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/amalfra/mongoose-webhooks/issues"
+  },
+  "homepage": "https://github.com/amalfra/mongoose-webhooks",
+  "keywords": [
+    "mongoose"
+  ],
+  "dependencies": {
+    "mongoose": "^3.8.23",
+    "request": "^2.72.0"
+  }
+}

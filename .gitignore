@@ -2,4 +2,5 @@ logs
 *.log
 .grunt
 node-modules
+node_modules
 *~
