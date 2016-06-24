@@ -1,6 +1,8 @@
 Mongoose Webhooks
 ========
 
+[![npm version](https://badge.fury.io/js/mongoose-webhooks.svg)](https://badge.fury.io/js/mongoose-webhooks)
+
 Sends webhook on mongoose model events.
 
 ## Installation
