@@ -35,8 +35,10 @@ var User = new Schema({
   created : Date
 });
 
-// Apply the plugin to schema. Note that the url option is required.
-User.plugin(mongooseWebhooks, {'url': 'http://site.com/mongoose-webhook'});
+// Apply the plugin to schema. Note that the urls option is required.
+User.plugin(mongooseWebhooks, {'urls': 'http://site.com/mongoose-webhook'});
+// urls options also supports multiple values. You can pass array of values if webhook needs to be delivered to multiple destinations
+User.plugin(mongooseWebhooks, {'urls': ['http://site1.com/mongoose-webhook', 'http://site2.com/mongoose-webhook']});
 ```
 
 Now you will be getting a webhook POST request to configured url. The webhook payload will be
@@ -64,7 +66,7 @@ The data key will have the JSON seralized document from mongoose.
 ## Options
 
 The two options supported by plugin are
-  * **url** : You can specify the URL to send webhook with this option. *This is a required option*
+  * **urls** : You can specify the URL(s) to send webhook with this option. This accepts multiple values as arrays too. *This is a required option*
   * **useragent** : Lets you specify the `User-Agent` header for the webhook request. This is optional.
 
 ## Development
