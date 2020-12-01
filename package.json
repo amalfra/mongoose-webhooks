@@ -3,6 +3,9 @@
   "version": "0.0.2",
   "description": "Mongoose plugin to send webhook on mongoose model events.",
   "main": "index.js",
+  "engines": {
+    "node": ">=12.14.1"
+  },
   "scripts": {
     "test": "npm test"
   },
@@ -20,7 +23,7 @@
     "mongoose"
   ],
   "dependencies": {
-    "mongoose": "^3.8.23",
-    "request": "^2.72.0"
+    "mongoose": "^5.11.0",
+    "node-fetch": "^2.6.1"
   }
 }
