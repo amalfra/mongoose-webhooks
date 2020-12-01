@@ -16,18 +16,18 @@ npm install mongoose-webhooks
 To use `mongoose-webhooks` plugin in your model you will have to first require the plugin as
 
 ```javascript
-var mongooseWebhooks = require('mongoose-webhooks');
+const mongooseWebhooks = require('mongoose-webhooks');
 ```
 
 The following schema definition defines a "User" schema, and uses mongoose-webhooks plugin
 
 ```javascript
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 // Require the plugin
-var mongooseWebhooks = require('mongoose-webhooks');
+const mongooseWebhooks = require('mongoose-webhooks');
 
-var User = new Schema({
+const User = new Schema({
   username : { type : String, required : true},
   password : { type : String, required : true },
   email : { type : String, required : true},
