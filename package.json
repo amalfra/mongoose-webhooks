@@ -7,6 +7,7 @@
     "node": ">=12.14.1"
   },
   "scripts": {
+    "pretest": "eslint --ignore-path .gitignore .",
     "test": "npm test"
   },
   "repository": {
@@ -25,5 +26,9 @@
   "dependencies": {
     "mongoose": "^5.11.8",
     "node-fetch": "^2.6.1"
+  },
+  "devDependencies": {
+    "eslint": "^6.1.0",
+    "eslint-config-strongloop": "^2.1.0"
   }
 }
