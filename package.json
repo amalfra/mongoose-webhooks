@@ -8,7 +8,7 @@
   },
   "scripts": {
     "pretest": "eslint --ignore-path .gitignore .",
-    "test": "npm test"
+    "test": "echo No tests"
   },
   "repository": {
     "type": "git",
