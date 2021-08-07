@@ -2,7 +2,7 @@ Mongoose Webhooks
 ========
 
 [![npm version](https://badge.fury.io/js/mongoose-webhooks.svg)](https://badge.fury.io/js/mongoose-webhooks)
-[![Build Status](https://travis-ci.org/amalfra/mongoose-webhooks.svg?branch=master)](https://travis-ci.org/amalfra/mongoose-webhooks)
+![Build Status](https://github.com/amalfra/mongoose-webhooks/actions/workflows/test.yml/badge.svg?branch=main)
 
 Sends webhook on mongoose model events.
 
