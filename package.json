@@ -7,8 +7,9 @@
     "npm": ">=7.19.1",
     "node": ">=18.0.0"
   },
+  "type": "module",
   "scripts": {
-    "pretest": "eslint --ignore-path .gitignore .",
+    "pretest": "eslint .",
     "test": "echo No tests"
   },
   "repository": {
