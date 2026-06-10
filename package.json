@@ -4,8 +4,8 @@
   "description": "Mongoose plugin to send webhook on mongoose model events.",
   "main": "index.js",
   "engines": {
-    "npm": ">=7.19.1",
-    "node": ">=18.0.0"
+    "npm": ">=10.0",
+    "node": ">=25.0.0"
   },
   "type": "module",
   "scripts": {
