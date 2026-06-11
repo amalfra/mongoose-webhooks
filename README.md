@@ -14,19 +14,28 @@ npm install mongoose-webhooks
 ```
 
 ## Usage
+
+> ⚠️ **WARNING:** Some hooks used by this plugin do refetching of the document again(though using lean) for passing data to webhook and hence there could be extra queries happening. For performance sake it must be checked depending on query method used to verify whether the use of this plugin creates performance degradation.
+
+> This plugin won't send webhooks for following methods since they don't fire mongoose hooks:
+> * bulkWrite
+> * Model.collection.drop
+> * mongoose.connection.dropDatabase
+
 To use `mongoose-webhooks` plugin in your model you will have to first require the plugin as
 
 ```javascript
-const mongooseWebhooks = require('mongoose-webhooks');
+import mongooseWebhooks from 'mongoose-webhooks';
 ```
 
 The following schema definition defines a "User" schema, and uses mongoose-webhooks plugin
 
 ```javascript
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+import mongoose from 'mongoose';
 // Require the plugin
-const mongooseWebhooks = require('mongoose-webhooks');
+import mongooseWebhooks from 'mongoose-webhooks';
+
+const Schema = mongoose.Schema;
 
 const User = new Schema({
   username : { type : String, required : true},
