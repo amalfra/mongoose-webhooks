@@ -1,6 +1,6 @@
 {
   "name": "mongoose-webhooks",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Mongoose plugin to send webhook on mongoose model events.",
   "main": "index.js",
   "engines": {
