@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Use Node.js 25
+      - name: Use Node.js 26
         uses: actions/setup-node@v2
         with:
-          node-version: 25
+          node-version: 26
       - name: Update npm
         run: npm install -g npm@latest
       - run: npm ci
