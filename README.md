@@ -3,6 +3,7 @@ Mongoose Webhooks
 
 [![npm version](https://badge.fury.io/js/mongoose-webhooks.svg)](https://badge.fury.io/js/mongoose-webhooks)
 ![Build Status](https://github.com/amalfra/mongoose-webhooks/actions/workflows/test.yml/badge.svg?branch=main)
+[![Coverage Status](https://coveralls.io/repos/github/amalfra/mongoose-webhooks/badge.svg?branch=main)](https://coveralls.io/github/amalfra/mongoose-webhooks?branch=main)
 
 Sends webhook on mongoose model events.
 
