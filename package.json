@@ -10,7 +10,7 @@
   "type": "module",
   "scripts": {
     "pretest": "eslint .",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js ."
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest --coverage ."
   },
   "repository": {
     "type": "git",
