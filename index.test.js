@@ -437,3 +437,120 @@ describe('MongooseWebhooksPlugin - error handling', () => {
     spy.mockRestore();
   });
 });
+
+describe('MongooseWebhooksPlugin - hook edge cases', () => {
+  function createHooks(opts = { urls: ['https://example1.com', 'https://example2.com'] }) {
+    const hooks = { pre: {}, post: {} };
+    const schema = {
+      statics: {},
+      pre(name, fn) { hooks.pre[name] = fn; },
+      post(name, fn) { hooks.post[name] = fn; },
+    };
+    MongooseWebhooksPlugin(schema, opts);
+    return { hooks, schema };
+  }
+
+  const invoke = (fn, context, ...args) => fn.apply(context, args);
+  const query = (doc, ids = []) => ({
+    findOne: jest.fn(() => ({ lean: jest.fn().mockResolvedValue(doc) })),
+    find: jest.fn(() => ({
+      lean: jest.fn().mockResolvedValue(Array.isArray(doc) ? doc : [doc]),
+      distinct: jest.fn().mockResolvedValue(ids),
+    })),
+    findById: jest.fn(() => ({ lean: jest.fn().mockResolvedValue(doc) })),
+  });
+
+  beforeEach(() => {
+    fetch.mockResolvedValue({ ok: true, status: 200 });
+  });
+
+  test('covers the emitter and save hooks, including the default URL and missing user agent', async () => {
+    const { hooks, schema } = createHooks({ url: 'https://example.com' });
+    expect(schema.statics._webhookEmitter).toBeDefined();
+    const next = jest.fn();
+    const doc = { id: '1' };
+    const context = { isNew: false };
+    invoke(hooks.pre.save, context, next);
+    invoke(hooks.post.save, context, doc);
+    await Promise.resolve();
+    expect(next).toHaveBeenCalled();
+    expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual({ event: 'update', data: doc });
+    expect(fetch.mock.calls[0][1].headers).toEqual({ 'Content-Type': 'application/json' });
+  });
+
+  test('covers updateOne no-op, missing document, and upsert paths', async () => {
+    const { hooks } = createHooks();
+    const model = query(null);
+    const ctx = { model, getQuery: () => ({ id: 1 }) };
+    await invoke(hooks.post.updateOne, ctx, {});
+    await invoke(hooks.post.updateOne, ctx, { modifiedCount: 1 });
+    expect(model.findOne).toHaveBeenCalledWith({ id: 1 });
+    const modelWithDoc = query({ id: '1' });
+    await invoke(hooks.post.updateOne, { ...ctx, model: modelWithDoc }, { upsertedCount: 1 });
+    await Promise.resolve();
+    expect(JSON.parse(fetch.mock.calls.at(-1)[1].body).event).toBe('save');
+  });
+
+  test('covers updateMany no-op, modified IDs, and single upsert ID paths', async () => {
+    const { hooks } = createHooks({ urls: 'https://example.com' });
+    const model = query([{ id: '1' }, { id: '2' }], ['1', '2']);
+    const ctx = { model, getFilter: () => ({ active: true }) };
+    await invoke(hooks.pre.updateMany, ctx);
+    await invoke(hooks.post.updateMany, ctx, {});
+    await invoke(hooks.post.updateMany, ctx, { modifiedCount: 2 });
+    expect(model.find).toHaveBeenLastCalledWith({ _id: { $in: ['1', '2'] } });
+    const upsertModel = query({ id: '3' });
+    await invoke(hooks.post.updateMany, { ...ctx, model: upsertModel }, { upsertedCount: 1, upsertedId: '3' });
+    await Promise.resolve();
+    expect(upsertModel.find).toHaveBeenCalledWith({ _id: { $in: ['3'] } });
+  });
+
+  test('covers findOneAndUpdate both result paths and missing documents', async () => {
+    const { hooks } = createHooks({ urls: 'https://example.com' });
+    const model = query({ id: 'updated' });
+    const ctx = { model, getQuery: () => ({ id: 1 }) };
+    await invoke(hooks.post.findOneAndUpdate, ctx, { id: 'original' });
+    await invoke(hooks.post.findOneAndUpdate, ctx, null);
+    await Promise.resolve();
+    expect(JSON.parse(fetch.mock.calls[0][1].body).event).toBe('update');
+    expect(JSON.parse(fetch.mock.calls[1][1].body).event).toBe('save');
+    await invoke(hooks.post.findOneAndUpdate, { ...ctx, model: query(null) }, null);
+  });
+
+  test('covers replace and findOneAndReplace no-op and found-document paths', async () => {
+    const { hooks } = createHooks({ urls: 'https://example.com' });
+    const model = query({ id: '1' });
+    const ctx = { model, getQuery: () => ({ id: 1 }) };
+    await invoke(hooks.post.replaceOne, ctx, {});
+    await invoke(hooks.post.replaceOne, { ...ctx, model: query(null) }, { modifiedCount: 1 });
+    await invoke(hooks.post.replaceOne, ctx, { modifiedCount: 1 });
+    await invoke(hooks.post.findOneAndReplace, { ...ctx, model: query(null) });
+    await invoke(hooks.post.findOneAndReplace, ctx);
+    await Promise.resolve();
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  test('covers delete hooks when no documents match and deleteMany has no cached docs', async () => {
+    const { hooks } = createHooks({ urls: 'https://example.com' });
+    const model = query(null);
+    const ctx = { model, getFilter: () => ({ id: 1 }) };
+    await invoke(hooks.pre.findOneAndDelete, ctx);
+    invoke(hooks.post.findOneAndDelete, ctx);
+    await invoke(hooks.pre.deleteOne, ctx);
+    invoke(hooks.post.deleteOne, ctx);
+    await invoke(hooks.pre.deleteMany, { ...ctx, model: query([]) });
+    invoke(hooks.post.deleteMany, {});
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  test('covers webhook rejection logging with and without an error message', async () => {
+    const { hooks } = createHooks({ urls: ['https://example1.com', 'https://example2.com'] });
+    const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    fetch.mockRejectedValueOnce({ message: 'offline' }).mockRejectedValueOnce('offline');
+    invoke(hooks.post.insertMany, {}, [{ id: '1' }]);
+    await new Promise(resolve => setImmediate(resolve));
+    expect(spy).toHaveBeenCalledWith('Error in send Webhook: HTTP error', 'offline');
+    expect(spy).toHaveBeenCalledWith('Error in send Webhook: HTTP error', 'offline');
+    spy.mockRestore();
+  });
+});
